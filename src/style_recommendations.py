@@ -78,9 +78,7 @@ answers_df.drop(columns=['Date'], inplace=True)
 answers_df.reset_index(drop=True, inplace=True)
 
 comercials = list(beers_dict.values())
-print(answers_df.head())
 answers_df = answers_df.fillna(answers_df.median())
-#answers_df.median(numeric_only=True)
 def drunk_distances(form):
     d_na = manhattan_distances([form], answers_df[comercials])
     d_na = d_na.max() - d_na
