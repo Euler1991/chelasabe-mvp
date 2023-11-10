@@ -1,5 +1,4 @@
 import dash_bootstrap_components as dbc
-import dash_tabulator
 import dash
 from dash import html, dcc, Input, Output, State
 import plotly.graph_objects as go
@@ -20,20 +19,7 @@ colors_imagotipo = {'yellow': '#e5b622',
                     'brown': '#623812',
                     'grey_l': '#e4e4e4',
                     'grey_m': '#B4AA99'}
-"""
-beer_columns = [{"title": "Cerveza",
-                 "field": "beer",
-                 'hozAlign': "center",
-                 'headerHozAlign': "center",
-                 'headerSort': False},
-                {'title': "Calificación",
-                 'field': "rating",
-                 'formatter': "star",
-                 'hozAlign': "center",
-                 'headerHozAlign': "center",
-                 'headerSort': False,
-                 'editor': True}]
-"""
+
 beers_dict = {'Bohemia Oscura': 'Boh_Osc',
               'Corona': 'Cor',
               'Dos Equis Ambar': 'Dos_Equ_Amb',
@@ -44,8 +30,6 @@ beers_dict = {'Bohemia Oscura': 'Boh_Osc',
               'Sol': 'Sol',
               'Tecate Light': 'Tec_Lig',
               'Victoria': 'Vic'}
-
-#beer_data = [{'id': beers_dict[key], 'beer': key, 'rating': '0'} for key in beers_dict.keys()]
 
 lager_dict = {'Pilsner': 'Pil',
               #'Pale Lager': 'Pal_Lag',
@@ -73,21 +57,18 @@ ale_colors = {'Wheat Beer':'#EDC15A',
               'Stout': '#050101'}
 #---------------------------------------------------------------------------------------------------
 tpu_card = dbc.Card(dbc.CardBody([html.P("¿No sabes qué beber?"),
-                                  html.P("Responde el cuestionario de cervezas para recomendarte estilos."),
-                                  html.P('Usa una estrella para las que no te gustan, y cinco para las que más te gustan. Las cervezas que no conozcas déjalas sin respuesta (SR).')]),
+                                  html.P("Usemos tu opinión sobre cervezas comerciales para recomendarte estilos de artesanales."),
+                                  html.P('Califica las cervezas, del 1 (no me gusta) al 5 (me encanta). Las que no conozcas márcalas como sin respuesta (SR).')]),
                     style={'height': '100%'})
 
 upt_card = dbc.Card(dbc.CardBody([html.P("¿Ya sabes qué estilos te gustan más?"),
-                                  html.P("Responde los cuestionarios de cervezas y estilos para  ayudar a recomendar estilos a usuarios nuevos.")]),
+                                  html.P("Compártenos tus gustos de cervezas y estilos para  ayudar a recomendar estilos a usuarios nuevos.")]),
                     style={'height': '100%'})
 
 hp_card = dbc.Card(dbc.CardBody([html.P("¿No sabes dónde ir a beber?"),
                                  html.P("Checa el mapa de sitios junto con sus respectivas redes y horarios.")]),
                     style={'height': '100%'})
 
-#beer_form = dash_tabulator.DashTabulator(id='beer-form',
-#                                         columns=beer_columns,
-#                                         data=beer_data)
 beer_marks = {0: 'SR',
               1: '1',
               2: '2',
@@ -97,7 +78,6 @@ beer_marks = {0: 'SR',
 
 beer_inputs = []
 for bc in beers_dict.keys():
-    print(bc)
     bc_input = html.Div([dbc.Row([dbc.Label(bc,
                                             width=3,
                                             style={'text-align': 'right'}),
@@ -121,7 +101,12 @@ tpu_button = html.Div([dbc.Button("Obtener Recomendaciones",
                                   n_clicks=0)],
                       style={"margin-bottom": "20px"},
                       className="d-grid gap-2 col-6 mx-auto")
-#style={"margin-bottom": "20px"}
+
+graph_card = dbc.Card(dbc.CardBody([html.H4("¿Qué tan afín eres a cada estilo?"),
+                                    html.P("Mientras más alto el valor, más probable es que te guste una cerveza de ese estilo. La línea punteada indica el promedio")]),
+                      color="light",
+                      outline=True,
+                      style={'height': '100%'})
 
 craft_graph = dcc.Graph(id='craft-graph',
                         config={'staticPlot':True,
@@ -133,6 +118,7 @@ tab_tpu = html.Div([dbc.Row([dbc.Col(tpu_card,
                     comercial,
                     tpu_button,
                     html.Hr(),
+                    graph_card,
                     craft_graph])
 
 tab_upt = html.Div([dbc.Row([dbc.Col(upt_card,
@@ -217,18 +203,17 @@ def render_recommendations(style_scores):
                             width=2,
                             dash='dot'))
 
-    fig.update_layout(title='Este es tu perfil de afinidades por estilo',
-                      title_x=0.5,
-                      showlegend=False,
-                      height=600,
-                      xaxis=dict(title='',
+    fig.update_layout(showlegend=False,
+                      height=500,
+                      xaxis=dict(title='Afinidad',
                                  titlefont_size=16,
                                  tickfont_size=14,
                                  dtick=1.0),
                       margin=dict(l=20,
                                   r=20,
                                   b=20,
-                                  t=30))
+                                  t=0),
+        template='seaborn')
 
     fig.update_xaxes(range=[0, 5],
                      constrain='domain')
